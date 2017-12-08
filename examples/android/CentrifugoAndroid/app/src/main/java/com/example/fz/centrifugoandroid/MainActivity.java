@@ -22,11 +22,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         TextView tv = (TextView) findViewById(R.id.text);
 
+        //创建令牌
         Credentials creds = Centrifuge.newCredentials(
                 "42", "1488055494", "",
                 "24d0aa4d7c679e45e151d268044723d07211c6a9465d0e35ee35303d13c5eeff"
         );
 
+        //绑定连接事件
         EventHandler events = Centrifuge.newEventHandler();
         ConnectHandler connectHandler = new AppConnectHandler(this);
         DisconnectHandler disconnectHandler = new AppDisconnectHandler(this);
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         events.onConnect(connectHandler);
         events.onDisconnect(disconnectHandler);
 
+        //创建客户端连接
         Client client = Centrifuge.new_(
                 "ws://192.168.1.200:8000/connection/websocket",
                 creds,
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         try {
+            //连接服务器
             client.connect();
         } catch (Exception e) {
             e.printStackTrace();
@@ -50,11 +54,13 @@ public class MainActivity extends AppCompatActivity {
         }
         tv.setText("Connected");
 
+        //绑定消息事件
         SubEventHandler subEvents = Centrifuge.newSubEventHandler();
         MessageHandler messageHandler = new AppMessageHandler(this);
         subEvents.onMessage(messageHandler);
 
         try {
+            //订阅通道
             Sub sub = client.subscribe("public:chat", subEvents);
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,6 +25,7 @@ public class AppMessageHandler implements MessageHandler {
             }
         });
         try {
+            //获得消息后通知服务器已读
             sub.readMessage(message.getUID());
         } catch (Exception e) {
             e.printStackTrace();

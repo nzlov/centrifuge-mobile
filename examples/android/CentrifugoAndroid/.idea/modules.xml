@@ -3,10 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CentrifugoAndroid.iml" filepath="$PROJECT_DIR$/CentrifugoAndroid.iml" />
-      <module fileurl="file://$PROJECT_DIR$/CentrifugoAndroid.iml" filepath="$PROJECT_DIR$/CentrifugoAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/centrifuge/centrifuge.iml" filepath="$PROJECT_DIR$/centrifuge/centrifuge.iml" />
       <module fileurl="file://$PROJECT_DIR$/centrifuge/centrifuge.iml" filepath="$PROJECT_DIR$/centrifuge/centrifuge.iml" />
     </modules>
   </component>
