@@ -4,10 +4,15 @@ package centrifuge
 
 type HistoryData struct {
 	messages []Message
+	total    int
 }
 
 func (d *HistoryData) NumMessages() int {
 	return len(d.messages)
+}
+
+func (d *HistoryData) Total() int {
+	return d.total
 }
 
 func (d *HistoryData) MessageAt(i int) *Message {
@@ -18,13 +23,14 @@ func (d *HistoryData) MessageAt(i int) *Message {
 }
 
 // History allows to extract channel history.
-func (s *Sub) History() (*HistoryData, error) {
-	messages, err := s.history()
+func (s *Sub) History(skip, limit int) (*HistoryData, error) {
+	messages, total, err := s.history(skip, limit)
 	if err != nil {
 		return nil, err
 	}
 	return &HistoryData{
 		messages: messages,
+		total:    total,
 	}, nil
 }
 

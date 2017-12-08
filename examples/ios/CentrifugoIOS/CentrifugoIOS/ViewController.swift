@@ -48,6 +48,12 @@ class MessageHandler : NSObject, CentrifugeMessageHandlerProtocol {
         DispatchQueue.main.async{
             self.l.text = p1.data()
         }
+        do {
+            var ok = UnsafeMutablePointer<ObjCBool>.allocate(capacity: 1)
+            try  p0.readMessage(p1.uid(), ret0_: ok)
+        } catch {
+            return
+        }
     }
 }
 
@@ -102,15 +108,6 @@ class ViewController: UIViewController {
                 return
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3), execute: {
-                do {
-                    let data = "{\"input\": \"hello\"}".data(using: .utf8)
-                    try sub?.publish(data)
-                } catch {
-                    self.label.text = "Publish error"
-                    return
-                }
-            })
         }
     }
     

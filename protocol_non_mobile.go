@@ -27,6 +27,7 @@ type rawClientInfo struct {
 
 type Message struct {
 	UID     string          `json:"uid"`
+	Read    bool            `json:"read"`
 	Info    *ClientInfo     `json:"info,omitempty"`
 	Channel string          `json:"channel"`
 	Data    json.RawMessage `json:"data"`
@@ -40,6 +41,7 @@ func messageFromRaw(m *rawMessage) *Message {
 
 type rawMessage struct {
 	UID     string          `json:"uid"`
+	Read    bool            `json:"read"`
 	Info    *ClientInfo     `json:"info,omitempty"`
 	Channel string          `json:"channel"`
 	Data    json.RawMessage `json:"data"`

@@ -24,5 +24,10 @@ public class AppMessageHandler implements MessageHandler {
                 tv.setText(message.getData());
             }
         });
+        try {
+            sub.readMessage(message.getUID());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

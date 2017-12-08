@@ -11,8 +11,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/centrifugal/centrifuge-mobile"
-	"github.com/centrifugal/centrifugo/libcentrifugo/auth"
+	centrifuge "github.com/nzlov/centrifuge-mobile"
+	"github.com/nzlov/centrifugo/libcentrifugo/auth"
 )
 
 // In production you need to receive credentials from application backend.

@@ -8,8 +8,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/centrifugal/centrifuge-mobile"
-	"github.com/centrifugal/centrifugo/libcentrifugo/auth"
+	centrifuge "github.com/nzlov/centrifuge-mobile"
+	"github.com/nzlov/centrifugo/libcentrifugo/auth"
 )
 
 type TestMessage struct {
@@ -20,6 +20,7 @@ type subEventHandler struct{}
 
 func (h *subEventHandler) OnMessage(sub *centrifuge.Sub, msg *centrifuge.Message) {
 	log.Println(fmt.Sprintf("New message received in channel %s: %#v", sub.Channel(), msg))
+	//sub.ReadMessage(msg.UID)
 }
 
 func (h *subEventHandler) OnJoin(sub *centrifuge.Sub, msg *centrifuge.ClientInfo) {
@@ -77,24 +78,28 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	data := TestMessage{Input: "example input"}
+	data := TestMessage{Input: fmt.Sprintf("Input:%v", time.Now())}
 	dataBytes, _ := json.Marshal(data)
 	err = sub.Publish(dataBytes)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	history, err := sub.History()
+	history, total, err := sub.History(0, -1)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Printf("%d messages in channel %s history", history.NumMessages(), sub.Channel())
+	log.Printf("get %d messages in channel %s history,total %d", len(history), sub.Channel(), total)
+
+	for i, msg := range history {
+		log.Printf("History %d : %+v\n", i, msg)
+	}
 
 	presence, err := sub.Presence()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Printf("%d clients in channel %s", presence.NumClients(), sub.Channel())
+	log.Printf("%d clients in channel %s", len(presence), sub.Channel())
 
 	err = sub.Unsubscribe()
 	if err != nil {

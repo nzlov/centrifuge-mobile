@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/centrifugal/centrifuge-mobile"
-	"github.com/centrifugal/centrifugo/libcentrifugo/auth"
+	centrifuge "github.com/nzlov/centrifuge-mobile"
+	"github.com/nzlov/centrifugo/libcentrifugo/auth"
 )
 
 func init() {

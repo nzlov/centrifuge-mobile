@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         events.onDisconnect(disconnectHandler);
 
         Client client = Centrifuge.new_(
-                "ws://192.168.1.33:8000/connection/websocket",
+                "ws://192.168.1.200:8000/connection/websocket",
                 creds,
                 events,
                 Centrifuge.defaultConfig()

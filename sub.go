@@ -153,7 +153,7 @@ func (s *Sub) Publish(data []byte) error {
 	}
 }
 
-func (s *Sub) history() ([]Message, error) {
+func (s *Sub) ReadMessage(msgid string) (bool, error) {
 	s.mu.Lock()
 	subCh := s.subscribeCh
 	s.mu.Unlock()
@@ -163,11 +163,29 @@ func (s *Sub) history() ([]Message, error) {
 		err := s.err
 		s.mu.Unlock()
 		if err != nil {
-			return nil, err
+			return false, err
 		}
-		return s.centrifuge.history(s.channel)
+		return s.centrifuge.readMessage(s.channel, msgid)
 	case <-time.After(time.Duration(s.centrifuge.config.TimeoutMilliseconds) * time.Millisecond):
-		return nil, ErrTimeout
+		return false, ErrTimeout
+	}
+}
+
+func (s *Sub) history(skip, limit int) ([]Message, int, error) {
+	s.mu.Lock()
+	subCh := s.subscribeCh
+	s.mu.Unlock()
+	select {
+	case <-subCh:
+		s.mu.Lock()
+		err := s.err
+		s.mu.Unlock()
+		if err != nil {
+			return nil, 0, err
+		}
+		return s.centrifuge.history(s.channel, skip, limit)
+	case <-time.After(time.Duration(s.centrifuge.config.TimeoutMilliseconds) * time.Millisecond):
+		return nil, 0, ErrTimeout
 	}
 }
 

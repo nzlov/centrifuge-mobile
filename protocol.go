@@ -39,6 +39,11 @@ type presenceClientCommand struct {
 	Params presenceParams `json:"params"`
 }
 
+type readClientCommand struct {
+	clientCommand
+	Params readParams `json:"params"`
+}
+
 type historyClientCommand struct {
 	clientCommand
 	Params historyParams `json:"params"`
@@ -86,6 +91,13 @@ type presenceParams struct {
 
 type historyParams struct {
 	Channel string `json:"channel"`
+	Skip    int    `json:"skip"`
+	Limit   int    `json:"limit"`
+}
+
+type readParams struct {
+	Channel string `json:"channel"`
+	MsgID   string `json:"msgid"`
 }
 
 type response struct {
@@ -134,6 +146,12 @@ type presenceResponseBody struct {
 type historyResponseBody struct {
 	Channel string       `json:"channel"`
 	Data    []rawMessage `json:"data"`
+	Total   int          `json:"total"`
+}
+type readResponseBody struct {
+	Channel string `json:"channel"`
+	MsgID   string `json:"msgid"`
+	Read    bool   `json:"read"`
 }
 
 type disconnectAdvice struct {

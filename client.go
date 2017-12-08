@@ -521,7 +521,7 @@ func (c *Client) handleAsyncResponse(resp response) error {
 		if !ok {
 			return nil
 		}
-		sub.handleMessage(messageFromRaw(m))
+		go sub.handleMessage(messageFromRaw(m))
 	case "join":
 		var b joinLeaveMessage
 		err := json.Unmarshal(body, &b)
@@ -535,7 +535,7 @@ func (c *Client) handleAsyncResponse(resp response) error {
 		if !ok {
 			return nil
 		}
-		sub.handleJoinMessage(clientInfoFromRaw(&b.Data))
+		go sub.handleJoinMessage(clientInfoFromRaw(&b.Data))
 	case "leave":
 		var b joinLeaveMessage
 		err := json.Unmarshal(body, &b)
@@ -549,7 +549,7 @@ func (c *Client) handleAsyncResponse(resp response) error {
 		if !ok {
 			return nil
 		}
-		sub.handleLeaveMessage(clientInfoFromRaw(&b.Data))
+		go sub.handleLeaveMessage(clientInfoFromRaw(&b.Data))
 	default:
 		return nil
 	}
@@ -965,19 +965,57 @@ func (c *Client) sendPublish(channel string, data []byte) (publishResponseBody, 
 	return body, nil
 }
 
-func (c *Client) history(channel string) ([]Message, error) {
-	body, err := c.sendHistory(channel)
+func (c *Client) readMessage(channel string, msgid string) (bool, error) {
+	body, err := c.sendReadMessage(channel, msgid)
 	if err != nil {
-		return []Message{}, err
+		return false, err
+	}
+	return body.Read, nil
+}
+
+func (c *Client) sendReadMessage(channel string, msgid string) (readResponseBody, error) {
+	cmd := readClientCommand{
+		clientCommand: clientCommand{
+			UID:    strconv.Itoa(int(c.nextMsgID())),
+			Method: "read",
+		},
+		Params: readParams{
+			Channel: channel,
+			MsgID:   msgid,
+		},
+	}
+	cmdBytes, err := json.Marshal(cmd)
+	if err != nil {
+		return readResponseBody{}, err
+	}
+	r, err := c.sendSync(cmd.UID, cmdBytes, c.timeout())
+	if err != nil {
+		return readResponseBody{}, err
+	}
+	if r.Error != "" {
+		return readResponseBody{}, errors.New(r.Error)
+	}
+	var body readResponseBody
+	err = json.Unmarshal(r.Body, &body)
+	if err != nil {
+		return readResponseBody{}, err
+	}
+	return body, nil
+}
+
+func (c *Client) history(channel string, skip, limit int) ([]Message, int, error) {
+	body, err := c.sendHistory(channel, skip, limit)
+	if err != nil {
+		return []Message{}, 0, err
 	}
 	messages := make([]Message, len(body.Data))
 	for i, m := range body.Data {
 		messages[i] = *messageFromRaw(&m)
 	}
-	return messages, nil
+	return messages, body.Total, nil
 }
 
-func (c *Client) sendHistory(channel string) (historyResponseBody, error) {
+func (c *Client) sendHistory(channel string, skip, limit int) (historyResponseBody, error) {
 	cmd := historyClientCommand{
 		clientCommand: clientCommand{
 			UID:    strconv.Itoa(int(c.nextMsgID())),
@@ -985,6 +1023,8 @@ func (c *Client) sendHistory(channel string) (historyResponseBody, error) {
 		},
 		Params: historyParams{
 			Channel: channel,
+			Skip:    skip,
+			Limit:   limit,
 		},
 	}
 	cmdBytes, err := json.Marshal(cmd)
