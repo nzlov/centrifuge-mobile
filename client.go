@@ -522,6 +522,21 @@ func (c *Client) handleAsyncResponse(resp response) error {
 			return nil
 		}
 		go sub.handleMessage(messageFromRaw(m))
+	case "read":
+		var m *readResponseBody
+		err := json.Unmarshal(body, &m)
+		if err != nil {
+			// Malformed message received.
+			return errors.New("malformed message received from server")
+		}
+		channel := m.Channel
+		c.subsMutex.RLock()
+		sub, ok := c.subs[string(channel)]
+		c.subsMutex.RUnlock()
+		if !ok {
+			return nil
+		}
+		go sub.handleRead(m)
 	case "join":
 		var b joinLeaveMessage
 		err := json.Unmarshal(body, &b)

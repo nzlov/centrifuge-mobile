@@ -24,6 +24,11 @@ type MessageHandler interface {
 	OnMessage(*Sub, *Message)
 }
 
+// ReadHandler is a function to handle read messages in channels.
+type ReadHandler interface {
+	OnRead(*Sub, string, string)
+}
+
 // JoinHandler is a function to handle join messages.
 type JoinHandler interface {
 	OnJoin(*Sub, *ClientInfo)
@@ -52,6 +57,7 @@ type SubscribeErrorHandler interface {
 // SubEventHandler contains callback functions that will be called when
 // corresponding event happens with subscription to channel.
 type SubEventHandler struct {
+	onRead             ReadHandler
 	onMessage          MessageHandler
 	onJoin             JoinHandler
 	onLeave            LeaveHandler
@@ -68,6 +74,11 @@ func NewSubEventHandler() *SubEventHandler {
 // OnMessage allows to set MessageHandler to SubEventHandler.
 func (h *SubEventHandler) OnMessage(handler MessageHandler) {
 	h.onMessage = handler
+}
+
+// OnRead allows to set ReadHandler to SubEventHandler.
+func (h *SubEventHandler) OnRead(handler ReadHandler) {
+	h.onRead = handler
 }
 
 // OnJoin allows to set JoinHandler to SubEventHandler.
@@ -284,6 +295,15 @@ func (s *Sub) handleMessage(m *Message) {
 	s.lastMessageMu.Unlock()
 	if handler != nil {
 		handler.OnMessage(s, m)
+	}
+}
+func (s *Sub) handleRead(m *readResponseBody) {
+	var handler ReadHandler
+	if s.events != nil && s.events.onRead != nil {
+		handler = s.events.onRead
+	}
+	if handler != nil {
+		handler.OnRead(s, m.Channel, m.MsgID)
 	}
 }
 

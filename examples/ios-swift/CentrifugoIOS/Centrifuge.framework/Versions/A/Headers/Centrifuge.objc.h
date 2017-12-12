@@ -42,6 +42,8 @@
 @class CentrifugeMessageHandler;
 @protocol CentrifugePrivateSubHandler;
 @class CentrifugePrivateSubHandler;
+@protocol CentrifugeReadHandler;
+@class CentrifugeReadHandler;
 @protocol CentrifugeRefreshHandler;
 @class CentrifugeRefreshHandler;
 @protocol CentrifugeSubscribeErrorHandler;
@@ -77,6 +79,10 @@
 
 @protocol CentrifugePrivateSubHandler <NSObject>
 - (CentrifugePrivateSign*)onPrivateSub:(CentrifugeClient*)p0 p1:(CentrifugePrivateRequest*)p1 error:(NSError**)error;
+@end
+
+@protocol CentrifugeReadHandler <NSObject>
+- (void)onRead:(CentrifugeSub*)p0 p1:(NSString*)p1 p2:(NSString*)p2;
 @end
 
 @protocol CentrifugeRefreshHandler <NSObject>
@@ -276,6 +282,8 @@
 - (void)setUID:(NSString*)v;
 - (BOOL)read;
 - (void)setRead:(BOOL)v;
+- (int64_t)timestamp;
+- (void)setTimestamp:(int64_t)v;
 - (CentrifugeClientInfo*)info;
 - (void)setInfo:(CentrifugeClientInfo*)v;
 - (NSString*)channel;
@@ -388,6 +396,10 @@ corresponding event happens with subscription to channel.
  * OnMessage allows to set MessageHandler to SubEventHandler.
  */
 - (void)onMessage:(id<CentrifugeMessageHandler>)handler;
+/**
+ * OnRead allows to set ReadHandler to SubEventHandler.
+ */
+- (void)onRead:(id<CentrifugeReadHandler>)handler;
 /**
  * OnSubscribeError allows to set SubscribeErrorHandler to SubEventHandler.
  */
@@ -538,6 +550,8 @@ FOUNDATION_EXPORT NSString* CentrifugeTimestamp(void);
 
 @class CentrifugePrivateSubHandler;
 
+@class CentrifugeReadHandler;
+
 @class CentrifugeRefreshHandler;
 
 @class CentrifugeSubscribeErrorHandler;
@@ -621,6 +635,17 @@ FOUNDATION_EXPORT NSString* CentrifugeTimestamp(void);
 
 - (instancetype)initWithRef:(id)ref;
 - (CentrifugePrivateSign*)onPrivateSub:(CentrifugeClient*)p0 p1:(CentrifugePrivateRequest*)p1 error:(NSError**)error;
+@end
+
+/**
+ * ReadHandler is a function to handle read messages in channels.
+ */
+@interface CentrifugeReadHandler : NSObject <goSeqRefInterface, CentrifugeReadHandler> {
+}
+@property(strong, readonly) id _ref;
+
+- (instancetype)initWithRef:(id)ref;
+- (void)onRead:(CentrifugeSub*)p0 p1:(NSString*)p1 p2:(NSString*)p2;
 @end
 
 /**

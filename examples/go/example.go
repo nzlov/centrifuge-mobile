@@ -20,7 +20,11 @@ type subEventHandler struct{}
 
 func (h *subEventHandler) OnMessage(sub *centrifuge.Sub, msg *centrifuge.Message) {
 	log.Println(fmt.Sprintf("New message received in channel %s: %#v", sub.Channel(), msg))
-	//sub.ReadMessage(msg.UID)
+	sub.ReadMessage(msg.UID)
+}
+
+func (h *subEventHandler) OnRead(sub *centrifuge.Sub, msgid string) {
+	log.Println(fmt.Sprintf("New Read Message received in channel %s: %s", sub.Channel(), msgid))
 }
 
 func (h *subEventHandler) OnJoin(sub *centrifuge.Sub, msg *centrifuge.ClientInfo) {
@@ -34,16 +38,17 @@ func (h *subEventHandler) OnLeave(sub *centrifuge.Sub, msg *centrifuge.ClientInf
 // In production you need to receive credentials from application backend.
 func credentials() *centrifuge.Credentials {
 	// Never show secret to client of your application. Keep it on your application backend only.
-	secret := "secret"
+	secret := "109AF84FWF45AS4S5W8F"
 	// Application user ID.
 	user := "42"
 	// Current timestamp as string.
-	timestamp := centrifuge.Timestamp()
+	timestamp := "1488055494"
 	// Empty info.
 	info := ""
 	// Generate client token so Centrifugo server can trust connection parameters received from client.
 	token := auth.GenerateClientToken(secret, user, timestamp, info)
 
+	fmt.Println("token:", token)
 	return &centrifuge.Credentials{
 		User:      user,
 		Timestamp: timestamp,
@@ -58,7 +63,7 @@ func main() {
 
 	started := time.Now()
 
-	wsURL := "ws://localhost:8000/connection/websocket"
+	wsURL := "ws://192.168.1.9:8000/connection/websocket"
 	c := centrifuge.New(wsURL, creds, nil, centrifuge.DefaultConfig())
 	defer c.Close()
 
@@ -71,6 +76,7 @@ func main() {
 	subEventHandler := &subEventHandler{}
 	events.OnMessage(subEventHandler)
 	events.OnJoin(subEventHandler)
+	events.OnRead(subEventHandler)
 	events.OnLeave(subEventHandler)
 
 	sub, err := c.Subscribe("public:chat", events)

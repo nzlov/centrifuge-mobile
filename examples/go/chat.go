@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	centrifuge "github.com/nzlov/centrifuge-mobile"
 	"github.com/nzlov/centrifugo/libcentrifugo/auth"
@@ -23,9 +24,9 @@ type ChatMessage struct {
 // In production you need to receive credentials from application backend.
 func credentials() *centrifuge.Credentials {
 	// Never show secret to client of your application. Keep it on your application backend only.
-	secret := "secret"
+	secret := "109AF84FWF45AS4S5W8F"
 	// Application user ID - anonymous in this case.
-	user := ""
+	user := "11"
 	// Current timestamp as string.
 	timestamp := centrifuge.Timestamp()
 	// Empty info.
@@ -54,19 +55,29 @@ func (h *eventHandler) OnDisconnect(c *centrifuge.Client, ctx *centrifuge.Discon
 	fmt.Fprintln(h.out, fmt.Sprintf("Disconnected from chat: %s", ctx.Reason))
 	return
 }
+func (h *eventHandler) OnError(c *centrifuge.Client, ctx *centrifuge.ErrorContext) {
+	fmt.Fprintln(h.out, fmt.Sprintf("Error from chat: %s", ctx))
+	return
+}
 
 func (h *eventHandler) OnMessage(sub *centrifuge.Sub, msg *centrifuge.Message) {
+	fmt.Fprintf(h.out, "NewMessage:%+v\n", msg)
 	var chatMessage *ChatMessage
 	err := json.Unmarshal(msg.Data, &chatMessage)
 	if err != nil {
 		return
 	}
-	rePrefix := chatMessage.Nick + " says:"
+	rePrefix := fmt.Sprintf("[%v]%s says:", time.Unix(msg.Timestamp, 0), chatMessage.Nick)
 	fmt.Fprintln(h.out, rePrefix, chatMessage.Input)
+	sub.ReadMessage(msg.UID)
 }
 
 func (h *eventHandler) OnJoin(sub *centrifuge.Sub, info *centrifuge.ClientInfo) {
 	fmt.Fprintln(h.out, fmt.Sprintf("Someone joined: user id %s", info.User))
+}
+
+func (h *eventHandler) OnRead(sub *centrifuge.Sub, channel, msgid string) {
+	fmt.Fprintln(h.out, "OnRead:", channel, msgid)
 }
 
 func (h *eventHandler) OnLeave(sub *centrifuge.Sub, info *centrifuge.ClientInfo) {
@@ -83,17 +94,19 @@ func (h *eventHandler) OnUnsubscribe(sub *centrifuge.Sub, ctx *centrifuge.Unsubs
 
 func main() {
 	creds := credentials()
-	wsURL := "wss://centrifugo.herokuapp.com/connection/websocket"
+	wsURL := "ws://192.168.1.200:8000/connection/websocket"
 
 	handler := &eventHandler{os.Stdout}
 
 	events := centrifuge.NewEventHandler()
 	events.OnConnect(handler)
+	events.OnError(handler)
 	events.OnDisconnect(handler)
 	c := centrifuge.New(wsURL, creds, events, centrifuge.DefaultConfig())
 
 	subEvents := centrifuge.NewSubEventHandler()
 	subEvents.OnMessage(handler)
+	subEvents.OnRead(handler)
 	subEvents.OnSubscribeSuccess(handler)
 	subEvents.OnUnsubscribe(handler)
 	subEvents.OnJoin(handler)
@@ -103,15 +116,18 @@ func main() {
 	fmt.Fprintf(os.Stdout, "Connect to %s\n", wsURL)
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 
-	sub, err := c.Subscribe("jsfiddle-chat", subEvents)
+	sub, err := c.Subscribe("public:chat", subEvents)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 	err = c.Connect()
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 
 	// Read input from stdin.
 	go func(sub *centrifuge.Sub) {

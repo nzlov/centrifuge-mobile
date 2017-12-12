@@ -7,7 +7,8 @@
 //
 
 #import "ViewController.h"
-
+#import <CommonCrypto/CommonDigest.h>
+#import <CommonCrypto/CommonHMAC.h>
 
 
 
@@ -25,7 +26,7 @@
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
         //创建令牌
-        CentrifugeCredentials* creds = CentrifugeNewCredentials(@"42", @"1488055494", @"", @"24d0aa4d7c679e45e151d268044723d07211c6a9465d0e35ee35303d13c5eeff");
+        CentrifugeCredentials* creds = CentrifugeNewCredentials(@"42", @"1488055494", @"", [self hmac:@"421488055494" withKey:@"109AF84FWF45AS4S5W8F"]);
         //绑定连接事件
         CentrifugeEventHandler* eventHandler = CentrifugeNewEventHandler();
         [eventHandler onConnect:self];
@@ -43,6 +44,21 @@
     });
 }
 
+- (NSString *)hmac:(NSString *)plaintext withKey:(NSString *)key
+{
+    const char *cKey  = [key cStringUsingEncoding:NSUTF8StringEncoding];
+    const char *cData = [plaintext cStringUsingEncoding:NSUTF8StringEncoding];
+    unsigned char cHMAC[CC_SHA256_DIGEST_LENGTH];
+    CCHmac(kCCHmacAlgSHA256, cKey, strlen(cKey), cData, strlen(cData), cHMAC);
+    NSData *HMACData = [NSData dataWithBytes:cHMAC length:sizeof(cHMAC)];
+    const unsigned char *buffer = (const unsigned char *)[HMACData bytes];
+    NSMutableString *HMAC = [NSMutableString stringWithCapacity:HMACData.length * 2];
+    for (int i = 0; i < HMACData.length; ++i){
+        [HMAC appendFormat:@"%02x", buffer[i]];
+    }
+    
+    return HMAC;
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

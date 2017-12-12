@@ -44,12 +44,13 @@ type rawClientInfo struct {
 }
 
 type Message struct {
-	UID     string      `json:"uid"`
-	Read    bool        `json:"read"`
-	Info    *ClientInfo `json:"info,omitempty"`
-	Channel string      `json:"channel"`
-	Data    string      `json:"data"`
-	Client  string      `json:"client,omitempty"`
+	UID       string      `json:"uid"`
+	Read      bool        `json:"read"`
+	Timestamp int64       `json:"timestamp"`
+	Info      *ClientInfo `json:"info,omitempty"`
+	Channel   string      `json:"channel"`
+	Data      string      `json:"data"`
+	Client    string      `json:"client,omitempty"`
 }
 
 func messageFromRaw(m *rawMessage) *Message {
@@ -58,20 +59,22 @@ func messageFromRaw(m *rawMessage) *Message {
 		data = string(m.Data)
 	}
 	return &Message{
-		UID:     m.UID,
-		Read:    m.Read,
-		Channel: m.Channel,
-		Info:    clientInfoFromRaw(m.Info),
-		Data:    data,
-		Client:  m.Client,
+		UID:       m.UID,
+		Read:      m.Read,
+		Channel:   m.Channel,
+		Timestamp: m.Timestamp,
+		Info:      clientInfoFromRaw(m.Info),
+		Data:      data,
+		Client:    m.Client,
 	}
 }
 
 type rawMessage struct {
-	UID     string          `json:"uid"`
-	Read    bool            `json:"read"`
-	Info    *rawClientInfo  `json:"info,omitempty"`
-	Channel string          `json:"channel"`
-	Data    json.RawMessage `json:"data"`
-	Client  string          `json:"client,omitempty"`
+	UID       string          `json:"uid"`
+	Read      bool            `json:"read"`
+	Timestamp int64           `json:"timestamp"`
+	Info      *rawClientInfo  `json:"info,omitempty"`
+	Channel   string          `json:"channel"`
+	Data      json.RawMessage `json:"data"`
+	Client    string          `json:"client,omitempty"`
 }
