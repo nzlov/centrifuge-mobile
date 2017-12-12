@@ -1,58 +1,55 @@
 package com.example.fz.centrifugoandroid;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 import centrifuge.Centrifuge;
 import centrifuge.Client;
-import centrifuge.Credentials;
-import centrifuge.EventHandler;
-import centrifuge.DisconnectHandler;
 import centrifuge.ConnectHandler;
+import centrifuge.Credentials;
+import centrifuge.DisconnectHandler;
+import centrifuge.EventHandler;
 import centrifuge.MessageHandler;
 import centrifuge.Sub;
 import centrifuge.SubEventHandler;
 
 public class MainActivity extends AppCompatActivity {
 
-
-    public String token(String secret,String user,String timestamp ,String info){
-        try
-        {
-            // SHA 加密开始
-            // 创建加密对象 并傳入加密類型
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            // 传入要加密的字符串
-            messageDigest.update(user.getBytes());
-            messageDigest.update(timestamp.getBytes());
-            messageDigest.update(info.getBytes());
-            // 得到 byte 類型结果
-            byte byteBuffer[] = messageDigest.digest();
-
-            // 將 byte 轉換爲 string
-            StringBuffer strHexString = new StringBuffer();
-            // 遍歷 byte buffer
-            for (int i = 0; i < byteBuffer.length; i++)
-            {
-                String hex = Integer.toHexString(0xff & byteBuffer[i]);
-                if (hex.length() == 1)
-                {
-                    strHexString.append('0');
-                }
-                strHexString.append(hex);
-            }
-            // 得到返回結果
-           return strHexString.toString();
+    /**
+     * 将加密后的字节数组转换成字符串
+     *
+     * @param b
+     *            字节数组
+     * @return 字符串
+     */
+    private static String byteArrayToHexString(byte[] b) {
+        StringBuilder hs = new StringBuilder();
+        String stmp;
+        for (int n = 0; b != null && n < b.length; n++) {
+            stmp = Integer.toHexString(b[n] & 0XFF);
+            if (stmp.length() == 1)
+                hs.append('0');
+            hs.append(stmp);
         }
-        catch (NoSuchAlgorithmException e)
-        {
-            e.printStackTrace();
+        return hs.toString().toLowerCase();
+    }
+
+    private static String token(String secret,String user,String timestamp,String info) {
+        String hash = "";
+        try {
+            Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+            sha256_HMAC.init(secret_key);
+            byte[] bytes = sha256_HMAC.doFinal((user+timestamp+info).getBytes());
+            hash = byteArrayToHexString(bytes);
+        } catch (Exception e) {
+            System.out.println("Error HmacSHA256 ===========" + e.getMessage());
         }
-        return "";
+        return hash;
     }
 
     @Override
@@ -77,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         //创建客户端连接
         Client client = Centrifuge.new_(
-                "ws://192.168.1.9:8000/connection/websocket",
+                "ws://192.168.1.200:8000/connection/websocket",
                 creds,
                 events,
                 Centrifuge.defaultConfig()
@@ -95,12 +92,13 @@ public class MainActivity extends AppCompatActivity {
 
         //绑定消息事件
         SubEventHandler subEvents = Centrifuge.newSubEventHandler();
-        MessageHandler messageHandler = new AppMessageHandler(this);
+        AppMessageHandler messageHandler = new AppMessageHandler(this);
         subEvents.onMessage(messageHandler);
+        subEvents.onRead(messageHandler);
 
         try {
             //订阅通道
-            Sub sub = client.subscribe("test", subEvents);
+            Sub sub = client.subscribe("public:chat", subEvents);
         } catch (Exception e) {
             e.printStackTrace();
         }

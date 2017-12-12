@@ -1,9 +1,9 @@
 package com.example.fz.centrifugoandroid;
 
-import android.os.Handler;
-import android.widget.TextView;
-import android.content.Context;
 import android.app.Activity;
+import android.content.Context;
+import android.widget.TextView;
+
 import centrifuge.Client;
 import centrifuge.DisconnectContext;
 import centrifuge.DisconnectHandler;

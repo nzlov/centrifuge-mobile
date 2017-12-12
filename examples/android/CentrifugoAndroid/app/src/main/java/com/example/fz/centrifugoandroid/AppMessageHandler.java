@@ -2,13 +2,15 @@ package com.example.fz.centrifugoandroid;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.widget.TextView;
 
 import centrifuge.Message;
 import centrifuge.MessageHandler;
+import centrifuge.ReadHandler;
 import centrifuge.Sub;
 
-public class AppMessageHandler implements MessageHandler {
+public class AppMessageHandler implements MessageHandler,ReadHandler {
     protected MainActivity context;
 
     public AppMessageHandler(Context context) {
@@ -30,5 +32,10 @@ public class AppMessageHandler implements MessageHandler {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onRead(Sub sub, final String ch,final String msgid) {
+        Log.i("Read",ch+"-"+msgid);
     }
 }

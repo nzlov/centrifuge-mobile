@@ -39,6 +39,7 @@
         //绑定消息事件
         CentrifugeSubEventHandler*  subEventHandler = CentrifugeNewSubEventHandler();
         [subEventHandler onMessage:self];
+        [subEventHandler onRead:self];
         //订阅通道
         [client subscribe:@"public:chat" events:subEventHandler error:NULL];
     });
@@ -72,6 +73,11 @@
         [self.label setText:@"Connected"];
     });
 }
+
+- (void)onRead:(CentrifugeClient *)p0 p1:(NSString*)p1 p2:(NSString*)p2 {
+    NSLog(@"OnRead:%@-%@",p1,p2);
+}
+
 
 - (void)onDisconnect:(CentrifugeClient *)p0 p1:(CentrifugeDisconnectContext *)p1 {
     
