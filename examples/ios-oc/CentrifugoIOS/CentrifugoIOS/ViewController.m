@@ -33,7 +33,7 @@
         [eventHandler onDisconnect:self];
         
         //创建客户端连接
-        CentrifugeClient *client = CentrifugeNew(@"ws://localhost:8000/connection/websocket", creds, eventHandler, CentrifugeDefaultConfig());
+        CentrifugeClient *client = CentrifugeNew(@"ws://192.168.1.9:8000/connection/websocket", creds, eventHandler, CentrifugeDefaultConfig());
         //连接服务器
         [client connect:NULL];
         //绑定消息事件
@@ -74,8 +74,8 @@
     });
 }
 
-- (void)onRead:(CentrifugeClient *)p0 p1:(NSString*)p1 p2:(NSString*)p2 {
-    NSLog(@"OnRead:%@-%@",p1,p2);
+-(void)onRead:(CentrifugeSub*)p0 p1:(NSString*)p1; {
+    NSLog(@"OnRead:%@-%@",p0.channel,p1);
 }
 
 

@@ -26,7 +26,7 @@ type MessageHandler interface {
 
 // ReadHandler is a function to handle read messages in channels.
 type ReadHandler interface {
-	OnRead(*Sub, string, string)
+	OnRead(*Sub, string)
 }
 
 // JoinHandler is a function to handle join messages.
@@ -303,7 +303,7 @@ func (s *Sub) handleRead(m *readResponseBody) {
 		handler = s.events.onRead
 	}
 	if handler != nil {
-		handler.OnRead(s, m.Channel, m.MsgID)
+		handler.OnRead(s, m.MsgID)
 	}
 }
 

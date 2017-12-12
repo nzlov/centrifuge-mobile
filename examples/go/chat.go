@@ -76,8 +76,8 @@ func (h *eventHandler) OnJoin(sub *centrifuge.Sub, info *centrifuge.ClientInfo) 
 	fmt.Fprintln(h.out, fmt.Sprintf("Someone joined: user id %s", info.User))
 }
 
-func (h *eventHandler) OnRead(sub *centrifuge.Sub, channel, msgid string) {
-	fmt.Fprintln(h.out, "OnRead:", channel, msgid)
+func (h *eventHandler) OnRead(sub *centrifuge.Sub, msgid string) {
+	fmt.Fprintln(h.out, "OnRead:", sub.Channel(), msgid)
 }
 
 func (h *eventHandler) OnLeave(sub *centrifuge.Sub, info *centrifuge.ClientInfo) {
@@ -94,7 +94,7 @@ func (h *eventHandler) OnUnsubscribe(sub *centrifuge.Sub, ctx *centrifuge.Unsubs
 
 func main() {
 	creds := credentials()
-	wsURL := "ws://192.168.1.200:8000/connection/websocket"
+	wsURL := "ws://192.168.1.9:8000/connection/websocket"
 
 	handler := &eventHandler{os.Stdout}
 

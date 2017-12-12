@@ -37,7 +37,7 @@ class DisconnectHandler : NSObject, CentrifugeDisconnectHandlerProtocol {
     }
 }
 
-class MessageHandler : NSObject, CentrifugeMessageHandlerProtocol {
+class MessageHandler : NSObject, CentrifugeMessageHandlerProtocol,CentrifugeReadHandlerProtocol {
     var l: UILabel!
     
     func setLabel(l: UILabel!) {
@@ -54,6 +54,9 @@ class MessageHandler : NSObject, CentrifugeMessageHandlerProtocol {
         } catch {
             return
         }
+    }
+    func onRead(_ p0: CentrifugeSub!, p1: String!) {
+        print("Read"+p1)
     }
 }
 
@@ -81,7 +84,7 @@ class ViewController: UIViewController {
             eventHandler?.onDisconnect(disconnectHandler)
             
             
-            let url = "ws://localhost:8000/connection/websocket"
+            let url = "ws://192.168.1.9:8000/connection/websocket"
             let client = CentrifugeNew(url, creds, eventHandler, CentrifugeDefaultConfig())
             
             do {
@@ -97,6 +100,7 @@ class ViewController: UIViewController {
             let messageHandler = MessageHandler()
             messageHandler.setLabel(l: self.label)
             subEventHandler?.onMessage(messageHandler)
+            subEventHandler?.onRead(messageHandler)
             
             var sub: CentrifugeSub!
             do {

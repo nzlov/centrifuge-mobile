@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         //创建客户端连接
         Client client = Centrifuge.new_(
-                "ws://192.168.1.200:8000/connection/websocket",
+                "ws://192.168.1.9:8000/connection/websocket",
                 creds,
                 events,
                 Centrifuge.defaultConfig()

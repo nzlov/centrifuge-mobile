@@ -35,7 +35,7 @@ public class AppMessageHandler implements MessageHandler,ReadHandler {
     }
 
     @Override
-    public void onRead(Sub sub, final String ch,final String msgid) {
-        Log.i("Read",ch+"-"+msgid);
+    public void onRead(Sub sub, final String msgid) {
+        Log.i("Read",sub.channel()+"-"+msgid);
     }
 }

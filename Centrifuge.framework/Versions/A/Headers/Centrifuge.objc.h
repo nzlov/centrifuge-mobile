@@ -82,7 +82,7 @@
 @end
 
 @protocol CentrifugeReadHandler <NSObject>
-- (void)onRead:(CentrifugeSub*)p0 p1:(NSString*)p1 p2:(NSString*)p2;
+- (void)onRead:(CentrifugeSub*)p0 p1:(NSString*)p1;
 @end
 
 @protocol CentrifugeRefreshHandler <NSObject>
@@ -645,7 +645,7 @@ FOUNDATION_EXPORT NSString* CentrifugeTimestamp(void);
 @property(strong, readonly) id _ref;
 
 - (instancetype)initWithRef:(id)ref;
-- (void)onRead:(CentrifugeSub*)p0 p1:(NSString*)p1 p2:(NSString*)p2;
+- (void)onRead:(CentrifugeSub*)p0 p1:(NSString*)p1;
 @end
 
 /**
