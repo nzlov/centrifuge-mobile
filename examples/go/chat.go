@@ -17,8 +17,12 @@ import (
 )
 
 type ChatMessage struct {
-	Input string `json:"input"`
-	Nick  string `json:"nick"`
+	Type    string `json:"type"`
+	From    string `json:"from"`
+	Img     string `json:"img"`
+	Name    string `json:"name"`
+	Ty      string `json:"ty"`
+	Content string `json:"content"`
 }
 
 // In production you need to receive credentials from application backend.
@@ -26,7 +30,7 @@ func credentials() *centrifuge.Credentials {
 	// Never show secret to client of your application. Keep it on your application backend only.
 	secret := "109AF84FWF45AS4S5W8F"
 	// Application user ID - anonymous in this case.
-	user := "11"
+	user := os.Args[2]
 	// Current timestamp as string.
 	timestamp := centrifuge.Timestamp()
 	// Empty info.
@@ -67,8 +71,8 @@ func (h *eventHandler) OnMessage(sub *centrifuge.Sub, msg *centrifuge.Message) {
 	if err != nil {
 		return
 	}
-	rePrefix := fmt.Sprintf("[%v]%s says:", time.Unix(msg.Timestamp, 0), chatMessage.Nick)
-	fmt.Fprintln(h.out, rePrefix, chatMessage.Input)
+	rePrefix := fmt.Sprintf("[%v]%s says:", time.Unix(msg.Timestamp, 0), chatMessage.Name)
+	fmt.Fprintln(h.out, rePrefix, chatMessage.Content)
 	sub.ReadMessage(msg.UID)
 }
 
@@ -116,7 +120,8 @@ func main() {
 	fmt.Fprintf(os.Stdout, "Connect to %s\n", wsURL)
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 
-	sub, err := c.Subscribe("public:chat", subEvents)
+	channel := os.Args[1] + ":" + os.Args[2]
+	sub, err := c.Subscribe(channel, subEvents)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -135,8 +140,9 @@ func main() {
 		for {
 			text, _ := reader.ReadString('\n')
 			msg := &ChatMessage{
-				Input: text,
-				Nick:  "goexample",
+				Content: text,
+				Name:    "goexample",
+				From:    channel,
 			}
 			data, _ := json.Marshal(msg)
 			sub.Publish(data)
