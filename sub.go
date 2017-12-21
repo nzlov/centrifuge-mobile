@@ -372,9 +372,13 @@ func (s *Sub) resubscribe() error {
 	}
 
 	if len(body.Messages) > 0 {
-		for _, v := range body.Messages {
-			s.handleMessage(messageFromRaw(&v))
-		}
+		defer func(){
+			go func(){
+				for _, v := range body.Messages {
+					s.handleMessage(messageFromRaw(&v))
+				}
+			}()
+		}()
 	} else {
 		lastID := string(body.Last)
 		s.lastMessageMu.Lock()

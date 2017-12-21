@@ -98,7 +98,7 @@ func (h *eventHandler) OnUnsubscribe(sub *centrifuge.Sub, ctx *centrifuge.Unsubs
 
 func main() {
 	creds := credentials()
-	wsURL := "ws://192.168.1.200:8000/connection/websocket"
+	wsURL := "ws://192.168.1.9:8000/connection/websocket"
 
 	handler := &eventHandler{os.Stdout}
 
