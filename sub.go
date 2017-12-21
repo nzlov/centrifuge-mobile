@@ -372,8 +372,8 @@ func (s *Sub) resubscribe() error {
 	}
 
 	if len(body.Messages) > 0 {
-		for i := len(body.Messages) - 1; i >= 0; i-- {
-			s.handleMessage(messageFromRaw(&body.Messages[i]))
+		for _, v := range body.Messages {
+			s.handleMessage(messageFromRaw(&v))
 		}
 	} else {
 		lastID := string(body.Last)

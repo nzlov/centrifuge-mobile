@@ -855,6 +855,28 @@ func (c *Client) Subscribe(channel string, events *SubEventHandler) (*Sub, error
 	return sub, err
 }
 
+// Subscribe allows to subscribe on channel.
+func (c *Client) SubscribeWithLastMsgID(channel, msgid string, events *SubEventHandler) (*Sub, error) {
+	c.subsMutex.Lock()
+	var sub *Sub
+	if _, ok := c.subs[channel]; ok {
+		sub = c.subs[channel]
+		sub.events = events
+	} else {
+		sub = c.newSub(channel, events)
+	}
+	c.subs[channel] = sub
+
+	if msgid != "" {
+		sub.lastMessageMu.Lock()
+		sub.lastMessageID = &msgid
+		sub.lastMessageMu.Unlock()
+	}
+	c.subsMutex.Unlock()
+	err := sub.resubscribe()
+	return sub, err
+}
+
 func (c *Client) subscribe(sub *Sub) error {
 
 	channel := sub.Channel()

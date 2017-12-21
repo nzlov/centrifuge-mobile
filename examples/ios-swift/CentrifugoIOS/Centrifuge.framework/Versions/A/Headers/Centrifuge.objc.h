@@ -123,6 +123,10 @@
  * Subscribe allows to subscribe on channel.
  */
 - (CentrifugeSub*)subscribe:(NSString*)channel events:(CentrifugeSubEventHandler*)events error:(NSError**)error;
+/**
+ * Subscribe allows to subscribe on channel.
+ */
+- (CentrifugeSub*)subscribeWithLastMsgID:(NSString*)channel msgid:(NSString*)msgid events:(CentrifugeSubEventHandler*)events error:(NSError**)error;
 @end
 
 @interface CentrifugeClientInfo : NSObject <goSeqRefInterface> {

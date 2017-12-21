@@ -73,7 +73,7 @@ func (h *eventHandler) OnMessage(sub *centrifuge.Sub, msg *centrifuge.Message) {
 	}
 	rePrefix := fmt.Sprintf("[%v]%s says:", time.Unix(msg.Timestamp, 0), chatMessage.Name)
 	fmt.Fprintln(h.out, rePrefix, chatMessage.Content)
-	sub.ReadMessage(msg.UID)
+	//sub.ReadMessage(msg.UID)
 }
 
 func (h *eventHandler) OnJoin(sub *centrifuge.Sub, info *centrifuge.ClientInfo) {
@@ -98,7 +98,7 @@ func (h *eventHandler) OnUnsubscribe(sub *centrifuge.Sub, ctx *centrifuge.Unsubs
 
 func main() {
 	creds := credentials()
-	wsURL := "ws://192.168.1.9:8000/connection/websocket"
+	wsURL := "ws://192.168.1.200:8000/connection/websocket"
 
 	handler := &eventHandler{os.Stdout}
 
@@ -121,7 +121,15 @@ func main() {
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 
 	channel := os.Args[1] + ":" + os.Args[2]
-	sub, err := c.Subscribe(channel, subEvents)
+	var sub *centrifuge.Sub
+	var err error
+	if len(os.Args) > 3 {
+
+		sub, err = c.SubscribeWithLastMsgID(channel, os.Args[3], subEvents)
+	} else {
+
+		sub, err = c.Subscribe(channel, subEvents)
+	}
 	if err != nil {
 		log.Fatalln(err)
 	}

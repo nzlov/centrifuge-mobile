@@ -1,5 +1,6 @@
 package com.example.fz.centrifugoandroid;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         //创建客户端连接
         Client client = Centrifuge.new_(
-                "ws://192.168.1.9:8000/connection/websocket",
+                "ws://192.168.1.200:8000/connection/websocket",
                 creds,
                 events,
                 Centrifuge.defaultConfig()
@@ -96,9 +97,12 @@ public class MainActivity extends AppCompatActivity {
         subEvents.onMessage(messageHandler);
         subEvents.onRead(messageHandler);
 
+        SharedPreferences sharedPreferences = this.getSharedPreferences("centrifugo", MODE_PRIVATE);
+
         try {
             //订阅通道
-            Sub sub = client.subscribe("public:chat", subEvents);
+            //传入保存的最后MSGID 消息服务器自动返回MSGID之后的消息到Message Handler
+            Sub sub = client.subscribeWithLastMsgID("users:wfhtqp",sharedPreferences.getString("lastMsgid","1"),subEvents);
         } catch (Exception e) {
             e.printStackTrace();
         }
