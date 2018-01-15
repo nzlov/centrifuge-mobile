@@ -134,8 +134,9 @@ type unsubscribeResponseBody struct {
 }
 
 type publishResponseBody struct {
-	Channel string `json:"channel"`
-	Status  bool   `json:"status"`
+	Channel string     `json:"channel"`
+	Status  bool       `json:"status"`
+	Message rawMessage `json:"message"`
 }
 
 type presenceResponseBody struct {

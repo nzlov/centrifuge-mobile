@@ -146,7 +146,7 @@ func (s *Sub) Channel() string {
 }
 
 // Publish allows to publish JSON encoded data to subscription channel.
-func (s *Sub) Publish(data []byte) error {
+func (s *Sub) Publish(data []byte) (*Message, error) {
 	s.mu.Lock()
 	subCh := s.subscribeCh
 	s.mu.Unlock()
@@ -156,11 +156,11 @@ func (s *Sub) Publish(data []byte) error {
 		err := s.err
 		s.mu.Unlock()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		return s.centrifuge.publish(s.channel, data)
 	case <-time.After(time.Duration(s.centrifuge.config.TimeoutMilliseconds) * time.Millisecond):
-		return ErrTimeout
+		return nil, ErrTimeout
 	}
 }
 
@@ -372,8 +372,8 @@ func (s *Sub) resubscribe() error {
 	}
 
 	if len(body.Messages) > 0 {
-		defer func(){
-			go func(){
+		defer func() {
+			go func() {
 				for _, v := range body.Messages {
 					s.handleMessage(messageFromRaw(&v))
 				}

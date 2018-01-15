@@ -10,19 +10,22 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
 
 	centrifuge "github.com/nzlov/centrifuge-mobile"
 	"github.com/nzlov/centrifugo/libcentrifugo/auth"
 )
 
-type ChatMessage struct {
+type CentrifugoMessageChat struct {
 	Type    string `json:"type"`
 	From    string `json:"from"`
+	To      string `json:"to"`
 	Img     string `json:"img"`
 	Name    string `json:"name"`
+	ToImg   string `json:"toimg"`
+	ToName  string `json:"toname"`
 	Ty      string `json:"ty"`
 	Content string `json:"content"`
+	GUID    string `json:"guid"`
 }
 
 // In production you need to receive credentials from application backend.
@@ -66,13 +69,7 @@ func (h *eventHandler) OnError(c *centrifuge.Client, ctx *centrifuge.ErrorContex
 
 func (h *eventHandler) OnMessage(sub *centrifuge.Sub, msg *centrifuge.Message) {
 	fmt.Fprintf(h.out, "NewMessage:%+v\n", msg)
-	var chatMessage *ChatMessage
-	err := json.Unmarshal(msg.Data, &chatMessage)
-	if err != nil {
-		return
-	}
-	rePrefix := fmt.Sprintf("[%v]%s says:", time.Unix(msg.Timestamp, 0), chatMessage.Name)
-	fmt.Fprintln(h.out, rePrefix, chatMessage.Content)
+
 	//sub.ReadMessage(msg.UID)
 }
 
@@ -98,7 +95,7 @@ func (h *eventHandler) OnUnsubscribe(sub *centrifuge.Sub, ctx *centrifuge.Unsubs
 
 func main() {
 	creds := credentials()
-	wsURL := "ws://192.168.1.9:8000/connection/websocket"
+	wsURL := "ws://192.168.1.200:8000/connection/websocket"
 
 	handler := &eventHandler{os.Stdout}
 
@@ -142,18 +139,38 @@ func main() {
 
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 
+	to := ""
+	switch os.Args[1] {
+	case "users":
+		to = "shops:" + os.Args[2]
+	case "shops":
+		to = "users:" + os.Args[2]
+	}
+	fmt.Println("To:", to)
+
 	// Read input from stdin.
 	go func(sub *centrifuge.Sub) {
 		reader := bufio.NewReader(os.Stdin)
 		for {
 			text, _ := reader.ReadString('\n')
-			msg := &ChatMessage{
-				Content: text,
-				Name:    "goexample",
+			msg := &CentrifugoMessageChat{
+				Type:    "chat",
 				From:    channel,
+				To:      to,
+				Img:     "",
+				Name:    "nzlov",
+				ToImg:   "",
+				ToName:  "店铺名",
+				Ty:      "text",
+				Content: text,
+				GUID:    "guid",
 			}
 			data, _ := json.Marshal(msg)
-			sub.Publish(data)
+			nmsg, err := sub.Publish(data)
+			if err != nil {
+				fmt.Println("Error:", err)
+			}
+			fmt.Printf("Push Msg :%+v\n", nmsg)
 		}
 	}(sub)
 

@@ -959,15 +959,15 @@ func (c *Client) sendSubscribe(channel string, lastMessageID *string, privateSig
 	return body, nil
 }
 
-func (c *Client) publish(channel string, data []byte) error {
+func (c *Client) publish(channel string, data []byte) (*Message, error) {
 	body, err := c.sendPublish(channel, data)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !body.Status {
-		return ErrBadPublishStatus
+		return nil, ErrBadPublishStatus
 	}
-	return nil
+	return messageFromRaw(&body.Message), nil
 }
 
 func (c *Client) sendPublish(channel string, data []byte) (publishResponseBody, error) {

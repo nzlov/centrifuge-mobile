@@ -363,7 +363,7 @@ wants to subscribe on private channel.
 /**
  * Publish allows to publish JSON encoded data to subscription channel.
  */
-- (BOOL)publish:(NSData*)data error:(NSError**)error;
+- (CentrifugeMessage*)publish:(NSData*)data error:(NSError**)error;
 - (BOOL)readMessage:(NSString*)msgid ret0_:(BOOL*)ret0_ error:(NSError**)error;
 /**
  * Subscribe allows to subscribe again after unsubscribing.
