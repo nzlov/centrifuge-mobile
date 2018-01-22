@@ -221,7 +221,7 @@ func (s *Sub) presence() (map[string]ClientInfo, error) {
 // Unsubscribe allows to unsubscribe from channel.
 func (s *Sub) Unsubscribe() error {
 	s.centrifuge.unsubscribe(s.channel)
-	s.triggerOnUnsubscribe(false)
+	s.triggerOnUnsubscribe(true)
 	return nil
 }
 

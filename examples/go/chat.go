@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 
 	centrifuge "github.com/nzlov/centrifuge-mobile"
 	"github.com/nzlov/centrifugo/libcentrifugo/auth"
@@ -121,15 +122,23 @@ func main() {
 	var sub *centrifuge.Sub
 	var err error
 	if len(os.Args) > 3 {
-
 		sub, err = c.SubscribeWithLastMsgID(channel, os.Args[3], subEvents)
 	} else {
-
 		sub, err = c.Subscribe(channel, subEvents)
 	}
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	go func() {
+		time.Sleep(time.Second * 5)
+		sub.Unsubscribe()
+		if len(os.Args) > 3 {
+			sub, err = c.SubscribeWithLastMsgID(channel, os.Args[3], subEvents)
+		} else {
+			sub, err = c.Subscribe(channel, subEvents)
+		}
+	}()
 
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 	err = c.Connect()
@@ -153,6 +162,9 @@ func main() {
 		reader := bufio.NewReader(os.Stdin)
 		for {
 			text, _ := reader.ReadString('\n')
+			if len(text) == 1 {
+				continue
+			}
 			msg := &CentrifugoMessageChat{
 				Type:    "chat",
 				From:    channel,

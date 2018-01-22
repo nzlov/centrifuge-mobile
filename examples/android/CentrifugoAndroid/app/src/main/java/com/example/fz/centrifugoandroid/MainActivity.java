@@ -3,6 +3,7 @@ package com.example.fz.centrifugoandroid;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import javax.crypto.Mac;
@@ -20,11 +21,14 @@ import centrifuge.SubEventHandler;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Sub sub;
+    private Client client;
+    private SubEventHandler subEvents;
+
     /**
      * 将加密后的字节数组转换成字符串
      *
-     * @param b
-     *            字节数组
+     * @param b 字节数组
      * @return 字符串
      */
     private static String byteArrayToHexString(byte[] b) {
@@ -39,13 +43,13 @@ public class MainActivity extends AppCompatActivity {
         return hs.toString().toLowerCase();
     }
 
-    private static String token(String secret,String user,String timestamp,String info) {
+    private static String token(String secret, String user, String timestamp, String info) {
         String hash = "";
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
             sha256_HMAC.init(secret_key);
-            byte[] bytes = sha256_HMAC.doFinal((user+timestamp+info).getBytes());
+            byte[] bytes = sha256_HMAC.doFinal((user + timestamp + info).getBytes());
             hash = byteArrayToHexString(bytes);
         } catch (Exception e) {
             System.out.println("Error HmacSHA256 ===========" + e.getMessage());
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         //创建令牌
         Credentials creds = Centrifuge.newCredentials(
                 "42", "1488055494", "",
-                token("109AF84FWF45AS4S5W8F","42","1488055494","")
+                token("109AF84FWF45AS4S5W8F", "42", "1488055494", "")
         );
 
         //绑定连接事件
@@ -74,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
         events.onDisconnect(disconnectHandler);
 
         //创建客户端连接
-        Client client = Centrifuge.new_(
-                "ws://192.168.1.9:8000/connection/websocket",
+        client = Centrifuge.new_(
+                "ws://192.168.1.200:8000/connection/websocket",
                 creds,
                 events,
                 Centrifuge.defaultConfig()
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         tv.setText("Connected");
 
         //绑定消息事件
-        SubEventHandler subEvents = Centrifuge.newSubEventHandler();
+        subEvents = Centrifuge.newSubEventHandler();
         AppMessageHandler messageHandler = new AppMessageHandler(this);
         subEvents.onMessage(messageHandler);
         subEvents.onRead(messageHandler);
@@ -102,7 +106,32 @@ public class MainActivity extends AppCompatActivity {
         try {
             //订阅通道
             //传入保存的最后MSGID 消息服务器自动返回MSGID之后的消息到Message Handler
-            Sub sub = client.subscribeWithLastMsgID("users:wfhtqp",sharedPreferences.getString("lastMsgid","1"),subEvents);
+            sub = client.subscribeWithLastMsgID("users:wfhtqp", sharedPreferences.getString("lastMsgid", "1"), subEvents);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences = this.getSharedPreferences("centrifugo", MODE_PRIVATE);
+        Log.i("c","onResume");
+        try {
+            //订阅通道
+            //传入保存的最后MSGID 消息服务器自动返回MSGID之后的消息到Message Handler
+            sub = client.subscribeWithLastMsgID("users:wfhtqp", sharedPreferences.getString("lastMsgid", "1"), subEvents);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Log.i("c","onPause");
+        try {
+            sub.unsubscribe();
         } catch (Exception e) {
             e.printStackTrace();
         }
