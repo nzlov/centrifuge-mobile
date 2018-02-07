@@ -10,7 +10,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"time"
 
 	centrifuge "github.com/nzlov/centrifuge-mobile"
 	"github.com/nzlov/centrifugo/libcentrifugo/auth"
@@ -34,7 +33,7 @@ func credentials() *centrifuge.Credentials {
 	// Never show secret to client of your application. Keep it on your application backend only.
 	secret := "109AF84FWF45AS4S5W8F"
 	// Application user ID - anonymous in this case.
-	user := os.Args[2]
+	user := os.Args[1]
 	// Current timestamp as string.
 	timestamp := centrifuge.Timestamp()
 	// Empty info.
@@ -96,7 +95,7 @@ func (h *eventHandler) OnUnsubscribe(sub *centrifuge.Sub, ctx *centrifuge.Unsubs
 
 func main() {
 	creds := credentials()
-	wsURL := "ws://192.168.1.200:8000/connection/websocket"
+	wsURL := "ws://192.168.1.9:8000/connection/websocket"
 
 	handler := &eventHandler{os.Stdout}
 
@@ -118,27 +117,31 @@ func main() {
 	fmt.Fprintf(os.Stdout, "Connect to %s\n", wsURL)
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 
-	channel := os.Args[1] + ":" + os.Args[2]
+	channel := os.Args[1]
+	if len(os.Args) > 2 {
+		channel += ":" + os.Args[2]
+	}
 	var sub *centrifuge.Sub
 	var err error
 	if len(os.Args) > 3 {
 		sub, err = c.SubscribeWithLastMsgID(channel, os.Args[3], subEvents)
 	} else {
-		sub, err = c.Subscribe(channel, subEvents)
+		sub, err = c.SubscribeWithLastMsgID(channel, "1", subEvents)
 	}
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	go func() {
-		time.Sleep(time.Second * 5)
-		sub.Unsubscribe()
-		if len(os.Args) > 3 {
-			sub, err = c.SubscribeWithLastMsgID(channel, os.Args[3], subEvents)
-		} else {
-			sub, err = c.Subscribe(channel, subEvents)
-		}
-	}()
+	//go func() {
+	//	time.Sleep(time.Second * 5)
+	//	sub.Unsubscribe()
+	//	time.Sleep(time.Second * 5)
+	//	if len(os.Args) > 3 {
+	//		sub, err = c.SubscribeWithLastMsgID(channel, os.Args[3], subEvents)
+	//	} else {
+	//		sub, err = c.Subscribe(channel, subEvents)
+	//	}
+	//}()
 
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 	err = c.Connect()
