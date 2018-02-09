@@ -95,7 +95,7 @@ func (h *eventHandler) OnUnsubscribe(sub *centrifuge.Sub, ctx *centrifuge.Unsubs
 
 func main() {
 	creds := credentials()
-	wsURL := "ws://192.168.1.9:8000/connection/websocket"
+	wsURL := "ws://message.93521.com:8000/connection/websocket"
 
 	handler := &eventHandler{os.Stdout}
 
@@ -118,9 +118,6 @@ func main() {
 	fmt.Fprintf(os.Stdout, "Print something and press ENTER to send\n")
 
 	channel := os.Args[1]
-	if len(os.Args) > 2 {
-		channel += ":" + os.Args[2]
-	}
 	var sub *centrifuge.Sub
 	var err error
 	if len(os.Args) > 3 {

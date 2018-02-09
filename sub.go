@@ -158,7 +158,14 @@ func (s *Sub) Publish(data []byte) (*Message, error) {
 		if err != nil {
 			return nil, err
 		}
-		return s.centrifuge.publish(s.channel, data)
+		message, err := s.centrifuge.publish(s.channel, data)
+		if err != nil {
+			return nil, err
+		}
+		s.lastMessageMu.Lock()
+		s.lastMessageID = &(message.UID)
+		s.lastMessageMu.Unlock()
+		return message, nil
 	case <-time.After(time.Duration(s.centrifuge.config.TimeoutMilliseconds) * time.Millisecond):
 		return nil, ErrTimeout
 	}
