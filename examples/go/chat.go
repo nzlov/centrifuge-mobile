@@ -74,7 +74,7 @@ func (h *eventHandler) OnMessage(sub *centrifuge.Sub, msg *centrifuge.Message) {
 }
 
 func (h *eventHandler) OnJoin(sub *centrifuge.Sub, info *centrifuge.ClientInfo) {
-	fmt.Fprintln(h.out, fmt.Sprintf("Someone joined: user id %s", info.User))
+	fmt.Fprintln(h.out, fmt.Sprintf("Someone joined: user id %s, client id %s", info.User, info.Client))
 }
 
 func (h *eventHandler) OnRead(sub *centrifuge.Sub, msgid string) {
@@ -82,7 +82,7 @@ func (h *eventHandler) OnRead(sub *centrifuge.Sub, msgid string) {
 }
 
 func (h *eventHandler) OnLeave(sub *centrifuge.Sub, info *centrifuge.ClientInfo) {
-	fmt.Fprintln(h.out, fmt.Sprintf("Someone left: user id %s", info.User))
+	fmt.Fprintln(h.out, fmt.Sprintf("Someone left: user id %s, client id %s", info.User, info.Client))
 }
 
 func (h *eventHandler) OnSubscribeSuccess(sub *centrifuge.Sub, ctx *centrifuge.SubscribeSuccessContext) {
