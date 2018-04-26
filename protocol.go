@@ -55,6 +55,7 @@ type pingClientCommand struct {
 
 type connectParams struct {
 	User      string `json:"user"`
+	Appkey    string `json:"appkey"`
 	Timestamp string `json:"timestamp"`
 	Info      string `json:"info"`
 	Token     string `json:"token"`
@@ -62,6 +63,7 @@ type connectParams struct {
 
 type refreshParams struct {
 	User      string `json:"user"`
+	Appkey    string `json:"appkey"`
 	Timestamp string `json:"timestamp"`
 	Info      string `json:"info"`
 	Token     string `json:"token"`

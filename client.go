@@ -23,15 +23,17 @@ func Timestamp() string {
 // Credentials describe client connection parameters.
 type Credentials struct {
 	User      string
+	Appkey    string
 	Timestamp string
 	Info      string
 	Token     string
 }
 
 // NewCredentials initializes Credentials.
-func NewCredentials(user, timestamp, info, token string) *Credentials {
+func NewCredentials(user, appkey, timestamp, info, token string) *Credentials {
 	return &Credentials{
 		User:      user,
+		Appkey:    appkey,
 		Timestamp: timestamp,
 		Info:      info,
 		Token:     token,
@@ -750,6 +752,7 @@ func (c *Client) sendRefresh() error {
 		},
 		Params: refreshParams{
 			User:      c.credentials.User,
+			Appkey:    c.credentials.Appkey,
 			Timestamp: c.credentials.Timestamp,
 			Info:      c.credentials.Info,
 			Token:     c.credentials.Token,
@@ -796,6 +799,7 @@ func (c *Client) sendConnect() (connectResponseBody, error) {
 		},
 		Params: connectParams{
 			User:      c.credentials.User,
+			Appkey:    c.credentials.Appkey,
 			Timestamp: c.credentials.Timestamp,
 			Info:      c.credentials.Info,
 			Token:     c.credentials.Token,

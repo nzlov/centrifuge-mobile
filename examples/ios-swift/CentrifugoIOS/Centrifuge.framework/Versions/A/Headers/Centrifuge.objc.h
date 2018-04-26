@@ -192,9 +192,11 @@
 /**
  * NewCredentials initializes Credentials.
  */
-- (instancetype)init:(NSString*)user timestamp:(NSString*)timestamp info:(NSString*)info token:(NSString*)token;
+- (instancetype)init:(NSString*)user appkey:(NSString*)appkey timestamp:(NSString*)timestamp info:(NSString*)info token:(NSString*)token;
 - (NSString*)user;
 - (void)setUser:(NSString*)v;
+- (NSString*)appkey;
+- (void)setAppkey:(NSString*)v;
 - (NSString*)timestamp;
 - (void)setTimestamp:(NSString*)v;
 - (NSString*)info;
@@ -520,7 +522,7 @@ FOUNDATION_EXPORT CentrifugeClient* CentrifugeNew(NSString* u, CentrifugeCredent
 /**
  * NewCredentials initializes Credentials.
  */
-FOUNDATION_EXPORT CentrifugeCredentials* CentrifugeNewCredentials(NSString* user, NSString* timestamp, NSString* info, NSString* token);
+FOUNDATION_EXPORT CentrifugeCredentials* CentrifugeNewCredentials(NSString* user, NSString* appkey, NSString* timestamp, NSString* info, NSString* token);
 
 /**
  * NewEventHandler initializes new EventHandler.

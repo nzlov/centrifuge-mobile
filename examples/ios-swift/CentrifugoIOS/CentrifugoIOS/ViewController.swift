@@ -71,7 +71,7 @@ class ViewController: UIViewController {
         
         DispatchQueue.main.async{
             let creds = CentrifugeNewCredentials(
-                "42", "1488055494", "", "24d0aa4d7c679e45e151d268044723d07211c6a9465d0e35ee35303d13c5eeff"
+                "42","ios_merchant", "1488055494", "", "17445e62d61dfd1fd9e81d0aede358bdeb490e3e9c6cd92f3fd661b72c95b37b"
             )
             
             let eventHandler = CentrifugeNewEventHandler()
@@ -84,7 +84,7 @@ class ViewController: UIViewController {
             eventHandler?.onDisconnect(disconnectHandler)
             
             
-            let url = "ws://192.168.1.9:8000/connection/websocket"
+            let url = "ws://192.168.1.200:8000/connection/websocket"
             let client = CentrifugeNew(url, creds, eventHandler, CentrifugeDefaultConfig())
             
             do {

@@ -25,15 +25,15 @@
     [self.label  setText: @"Connecting..."];
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        //创建令牌
-        CentrifugeCredentials* creds = CentrifugeNewCredentials(@"42", @"1488055494", @"", [self hmac:@"421488055494" withKey:@"109AF84FWF45AS4S5W8F"]);
+        //创建令牌 gentoken: user appkey timestamp
+        CentrifugeCredentials* creds = CentrifugeNewCredentials(@"42", @"ios_merchant",@"1488055494", @"", [self hmac:@"42b46125f0fb1488055494" withKey:@"109AF84FWF45AS4S5W8F"]);
         //绑定连接事件
         CentrifugeEventHandler* eventHandler = CentrifugeNewEventHandler();
         [eventHandler onConnect:self];
         [eventHandler onDisconnect:self];
         
         //创建客户端连接
-        CentrifugeClient *client = CentrifugeNew(@"ws://192.168.1.9:8000/connection/websocket", creds, eventHandler, CentrifugeDefaultConfig());
+        CentrifugeClient *client = CentrifugeNew(@"ws://192.168.1.200:8000/connection/websocket", creds, eventHandler, CentrifugeDefaultConfig());
         //连接服务器
         [client connect:NULL];
         //绑定消息事件

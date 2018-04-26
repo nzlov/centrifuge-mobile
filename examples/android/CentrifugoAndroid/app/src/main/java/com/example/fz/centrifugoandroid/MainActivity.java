@@ -15,7 +15,6 @@ import centrifuge.ConnectHandler;
 import centrifuge.Credentials;
 import centrifuge.DisconnectHandler;
 import centrifuge.EventHandler;
-import centrifuge.MessageHandler;
 import centrifuge.Sub;
 import centrifuge.SubEventHandler;
 
@@ -43,13 +42,13 @@ public class MainActivity extends AppCompatActivity {
         return hs.toString().toLowerCase();
     }
 
-    private static String token(String secret, String user, String timestamp, String info) {
+    private static String token(String secret, String appkey, String user, String timestamp, String info) {
         String hash = "";
         try {
             Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
             SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
             sha256_HMAC.init(secret_key);
-            byte[] bytes = sha256_HMAC.doFinal((user + timestamp + info).getBytes());
+            byte[] bytes = sha256_HMAC.doFinal((user + appkey + timestamp + info).getBytes());
             hash = byteArrayToHexString(bytes);
         } catch (Exception e) {
             System.out.println("Error HmacSHA256 ===========" + e.getMessage());
@@ -65,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
         //创建令牌
         Credentials creds = Centrifuge.newCredentials(
-                "42", "1488055494", "",
-                token("109AF84FWF45AS4S5W8F", "42", "1488055494", "")
+                "42", "android_merchant", "1488055494", "",
+                token("109AF84FWF45AS4S5W8F", "57a883afde","42", "1488055494", "")
         );
 
         //绑定连接事件
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         SharedPreferences sharedPreferences = this.getSharedPreferences("centrifugo", MODE_PRIVATE);
-        Log.i("c","onResume");
+        Log.i("c", "onResume");
         try {
             //订阅通道
             //传入保存的最后MSGID 消息服务器自动返回MSGID之后的消息到Message Handler
@@ -127,9 +126,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
-        Log.i("c","onPause");
+        Log.i("c", "onPause");
         try {
             sub.unsubscribe();
         } catch (Exception e) {
