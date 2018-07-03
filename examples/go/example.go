@@ -3,10 +3,8 @@ package main
 // Connect, subscribe on channel, publish into channel, read presence and history info.
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"time"
 
 	centrifuge "github.com/nzlov/centrifuge-mobile"
 	"github.com/nzlov/centrifugo/libcentrifugo/auth"
@@ -41,16 +39,18 @@ func credentials() *centrifuge.Credentials {
 	secret := "109AF84FWF45AS4S5W8F"
 	// Application user ID.
 	user := "42"
+	appkey := "web_merchant"
 	// Current timestamp as string.
 	timestamp := "1488055494"
 	// Empty info.
 	info := ""
 	// Generate client token so Centrifugo server can trust connection parameters received from client.
-	token := auth.GenerateClientToken(secret, user, timestamp, info)
+	token := auth.GenerateClientToken(secret, user, "c31df7e10a", timestamp, info)
 
 	fmt.Println("token:", token)
 	return &centrifuge.Credentials{
 		User:      user,
+		Appkey:    appkey,
 		Timestamp: timestamp,
 		Info:      info,
 		Token:     token,
@@ -61,9 +61,9 @@ func main() {
 	// In production you need to receive credentials from application backend.
 	creds := credentials()
 
-	started := time.Now()
+	//started := time.Now()
 
-	wsURL := "ws://192.168.1.9:8000/connection/websocket"
+	wsURL := "ws://192.168.1.200:8000/connection/websocket"
 	c := centrifuge.New(wsURL, creds, nil, centrifuge.DefaultConfig())
 	defer c.Close()
 
@@ -72,46 +72,50 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	events := centrifuge.NewSubEventHandler()
-	subEventHandler := &subEventHandler{}
-	events.OnMessage(subEventHandler)
-	events.OnJoin(subEventHandler)
-	events.OnRead(subEventHandler)
-	events.OnLeave(subEventHandler)
+	//	events := centrifuge.NewSubEventHandler()
+	//	subEventHandler := &subEventHandler{}
+	//	events.OnMessage(subEventHandler)
+	//	events.OnJoin(subEventHandler)
+	//	events.OnRead(subEventHandler)
+	//	events.OnLeave(subEventHandler)
+	//
+	//	sub, err := c.Subscribe("public:chat", events)
+	//	if err != nil {
+	//		log.Fatalln(err)
+	//	}
+	//
+	//	data := TestMessage{Input: fmt.Sprintf("Input:%v", time.Now())}
+	//	dataBytes, _ := json.Marshal(data)
+	//	_, err = sub.Publish(dataBytes)
+	//	if err != nil {
+	//		log.Fatalln(err)
+	//	}
+	//
+	//	history, total, err := sub.History(0, -1)
+	//	if err != nil {
+	//		log.Fatalln(err)
+	//	}
+	//	log.Printf("get %d messages in channel %s history,total %d", len(history), sub.Channel(), total)
+	//
+	//	for i, msg := range history {
+	//		log.Printf("History %d : %+v\n", i, msg)
+	//	}
+	//
+	//	presence, err := sub.Presence()
+	//	if err != nil {
+	//		log.Fatalln(err)
+	//	}
+	//	log.Printf("%d clients in channel %s", len(presence), sub.Channel())
+	//
+	//	err = sub.Unsubscribe()
+	//	if err != nil {
+	//		log.Fatalln(err)
+	//	}
+	//
+	//	log.Printf("%s", time.Since(started))
+	//
+	log.Println("Test Micro")
 
-	sub, err := c.Subscribe("public:chat", events)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	data := TestMessage{Input: fmt.Sprintf("Input:%v", time.Now())}
-	dataBytes, _ := json.Marshal(data)
-	err = sub.Publish(dataBytes)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	history, total, err := sub.History(0, -1)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("get %d messages in channel %s history,total %d", len(history), sub.Channel(), total)
-
-	for i, msg := range history {
-		log.Printf("History %d : %+v\n", i, msg)
-	}
-
-	presence, err := sub.Presence()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("%d clients in channel %s", len(presence), sub.Channel())
-
-	err = sub.Unsubscribe()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log.Printf("%s", time.Since(started))
-
+	resp, err := c.Micro("Activity.Call", `{"a":1}`)
+	log.Println(string(resp.Data), err)
 }

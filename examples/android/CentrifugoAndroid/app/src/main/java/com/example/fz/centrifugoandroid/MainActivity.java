@@ -15,6 +15,7 @@ import centrifuge.ConnectHandler;
 import centrifuge.Credentials;
 import centrifuge.DisconnectHandler;
 import centrifuge.EventHandler;
+import centrifuge.MicroResponseBody;
 import centrifuge.Sub;
 import centrifuge.SubEventHandler;
 
@@ -92,6 +93,17 @@ public class MainActivity extends AppCompatActivity {
             tv.setText(e.getMessage());
             return;
         }
+        try {
+            //调用微服务
+            MicroResponseBody body = client.micro("Activity.Call","{\"a\":1}");
+            Log.d("micro",body.getData());
+        } catch (Exception e) {
+            e.printStackTrace();
+            tv.setText(e.getMessage());
+            return;
+        }
+
+
         tv.setText("Connected");
 
         //绑定消息事件

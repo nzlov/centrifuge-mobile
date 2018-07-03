@@ -53,6 +53,11 @@ type pingClientCommand struct {
 	clientCommand
 }
 
+type microClientCommand struct {
+	clientCommand
+	Params microParams `json:"params"`
+}
+
 type connectParams struct {
 	User      string `json:"user"`
 	Appkey    string `json:"appkey"`
@@ -100,6 +105,11 @@ type historyParams struct {
 type readParams struct {
 	Channel string `json:"channel"`
 	MsgID   string `json:"msgid"`
+}
+
+type microParams struct {
+	Name string          `json:"name"`
+	Data json.RawMessage `json:"data"`
 }
 
 type response struct {
@@ -157,6 +167,10 @@ type readResponseBody struct {
 	Read    bool   `json:"read"`
 }
 
+type MicroResponseBody struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
+}
 type disconnectAdvice struct {
 	Reason    string `json:"reason"`
 	Reconnect bool   `json:"reconnect"`

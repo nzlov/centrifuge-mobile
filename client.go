@@ -842,6 +842,36 @@ func (c *Client) privateSign(channel string) (*PrivateSign, error) {
 	return ps, nil
 }
 
+func (c *Client) Micro(name string, data string) (*MicroResponseBody, error) {
+	cmd := microClientCommand{
+		clientCommand: clientCommand{
+			UID:    strconv.Itoa(int(c.nextMsgID())),
+			Method: "micro",
+		},
+		Params: microParams{
+			Name: name,
+			Data: json.RawMessage(data),
+		},
+	}
+	cmdBytes, err := json.Marshal(cmd)
+	if err != nil {
+		return &MicroResponseBody{}, err
+	}
+	r, err := c.sendSync(cmd.UID, cmdBytes, c.timeout())
+	if err != nil {
+		return &MicroResponseBody{}, err
+	}
+	if r.Error != "" {
+		return &MicroResponseBody{}, errors.New(err.Error())
+	}
+	body := &MicroResponseBody{}
+	err = json.Unmarshal(r.Body, body)
+	if err != nil {
+		return &MicroResponseBody{}, err
+	}
+	return body, nil
+}
+
 // Subscribe allows to subscribe on channel.
 func (c *Client) Subscribe(channel string, events *SubEventHandler) (*Sub, error) {
 	c.subsMutex.Lock()

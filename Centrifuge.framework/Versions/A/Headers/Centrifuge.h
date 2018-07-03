@@ -8,6 +8,6 @@
 #define __Centrifuge_FRAMEWORK_H__
 
 #include "Centrifuge.objc.h"
-#include "Universe.objc.h"
+#include "universe.objc.h"
 
 #endif

@@ -96,6 +96,14 @@ class ViewController: UIViewController {
             
             self.label.text = "Connected"
             
+            do {
+               let micro = try client?.micro("Activity.Call", data: "{\"a\":1}")
+                print(micro?.data())
+            } catch {
+                self.label.text = "Error on micro..."
+                return
+            }
+            
             let subEventHandler = CentrifugeNewSubEventHandler()
             let messageHandler = MessageHandler()
             messageHandler.setLabel(l: self.label)

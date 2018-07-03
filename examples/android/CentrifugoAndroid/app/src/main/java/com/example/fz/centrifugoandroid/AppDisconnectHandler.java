@@ -20,7 +20,7 @@ public class AppDisconnectHandler implements DisconnectHandler {
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                TextView tv = (TextView) ((Activity) context).findViewById(R.id.text);
+                TextView tv = (TextView) context.findViewById(R.id.text);
                 tv.setText("Disconnected");
             }
         });

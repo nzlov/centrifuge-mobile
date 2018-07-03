@@ -20,6 +20,7 @@
 @class CentrifugeEventHandler;
 @class CentrifugeHistoryData;
 @class CentrifugeMessage;
+@class CentrifugeMicroResponseBody;
 @class CentrifugePresenceData;
 @class CentrifugePrivateRequest;
 @class CentrifugePrivateSign;
@@ -119,6 +120,7 @@
  */
 - (BOOL)connect:(NSError**)error;
 - (BOOL)disconnect:(NSError**)error;
+- (CentrifugeMicroResponseBody*)micro:(NSString*)name data:(NSString*)data error:(NSError**)error;
 /**
  * Subscribe allows to subscribe on channel.
  */
@@ -298,6 +300,18 @@
 - (void)setData:(NSString*)v;
 - (NSString*)client;
 - (void)setClient:(NSString*)v;
+@end
+
+@interface CentrifugeMicroResponseBody : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) id _ref;
+
+- (instancetype)initWithRef:(id)ref;
+- (instancetype)init;
+- (NSString*)name;
+- (void)setName:(NSString*)v;
+- (NSString*)data;
+- (void)setData:(NSString*)v;
 @end
 
 @interface CentrifugePresenceData : NSObject <goSeqRefInterface> {

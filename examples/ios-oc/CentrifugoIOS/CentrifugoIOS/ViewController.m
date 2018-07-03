@@ -42,6 +42,14 @@
         [subEventHandler onRead:self];
         //订阅通道
         [client subscribe:@"public:chat" events:subEventHandler error:NULL];
+        
+        // 微服务调用
+        // 第一个是服务名
+        // 第二个是请求参数json后的字符串
+        // 返回是json后的字符串
+        CentrifugeMicroResponseBody *micro = [client micro:@"Activity.Call" data:@"{\"a\":1}" error:nil];
+          NSLog(@"micro:%@",micro.data);
+        
     });
 }
 
